@@ -30,6 +30,7 @@ interface ArticleRow {
   tags: string[] | null;
   body: string | null;
   word_count: number | null;
+  view_count: number | null;
 }
 
 function mapRow(row: ArticleRow): Article {
@@ -266,4 +267,27 @@ export async function fetchPopularTags(limit = 20): Promise<{ tag: string; count
     .sort((a, b) => b[1] - a[1])
     .slice(0, limit)
     .map(([tag, count]) => ({ tag, count }));
+}
+
+/** Fetch articles sorted by view_count DESC — powers "Most Read" section.
+ *  Falls back to recency sort if the view_count column doesn't exist yet. */
+export async function fetchMostPopular(limit = 5): Promise<Article[]> {
+  const { data, error } = await supabase
+    .from('articles')
+    .select('*')
+    .order('view_count', { ascending: false, nullsFirst: false })
+    .order('published_at', { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    // Column not yet added — fall back to most-recent
+    return fetchArticles(limit);
+  }
+  return (data as ArticleRow[]).map(mapRow);
+}
+
+/** Increment view_count for a single article via SECURITY DEFINER RPC.
+ *  Silently no-ops if the RPC or column don't exist yet. */
+export async function incrementViewCount(articleId: string): Promise<void> {
+  await supabase.rpc('increment_view_count', { article_id: articleId });
 }

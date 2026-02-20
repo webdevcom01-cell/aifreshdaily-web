@@ -15,7 +15,7 @@ export default function GreatReads() {
   const [articles, setArticles] = useState<Article[]>([]);
 
   useEffect(() => {
-    fetchByCategory('Education', 4).then(setArticles).catch(() => {});
+    fetchByCategory('learn', 4).then(setArticles).catch(() => {});
   }, []);
 
   return (
@@ -25,7 +25,7 @@ export default function GreatReads() {
           <GraduationCap className="w-5 h-5 text-ai-purple dark:text-ai-cyan" />
           <h2 className="text-xl font-bold text-gray-900 dark:text-white font-heading">AI Academy</h2>
           <div className="flex-1 h-px bg-gradient-to-r from-ai-purple/20 to-transparent" />
-          <Link href="/category/education" className="text-sm font-semibold text-ai-purple dark:text-ai-cyan hover:underline flex items-center gap-1 group">
+          <Link href="/category/learn" className="text-sm font-semibold text-ai-purple dark:text-ai-cyan hover:underline flex items-center gap-1 group">
             All courses
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Link>

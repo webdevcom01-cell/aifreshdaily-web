@@ -1,7 +1,7 @@
 "use client"
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { fetchArticles } from '@/lib/supabase';
+import { fetchMostPopular } from '@/lib/supabase';
 import type { Article } from '@/types';
 import { BarChart3 } from 'lucide-react';
 
@@ -9,7 +9,7 @@ export default function MostPopular() {
   const [articles, setArticles] = useState<Article[]>([]);
 
   useEffect(() => {
-    fetchArticles(5).then(setArticles).catch(() => {});
+    fetchMostPopular(5).then(setArticles).catch(() => {});
   }, []);
 
   if (articles.length === 0) {

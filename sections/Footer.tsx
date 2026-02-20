@@ -2,23 +2,58 @@
 import { Cpu } from 'lucide-react';
 import Link from 'next/link';
 
-const footerLinks = {
-  models: ['OpenAI / GPT', 'Anthropic / Claude', 'Google / Gemini', 'xAI / Grok', 'DeepSeek', 'Moonshot / Kimi', 'Meta / Llama', 'Mistral AI'],
-  agents: ['Multi-Agent Systems', 'Agent Swarm', 'Enterprise Agents', 'Autonomous Workflows', 'AI Assistants', 'Human-in-the-Loop'],
-  industry: ['Healthcare', 'Finance', 'Legal', 'Education', 'Manufacturing', 'Marketing'],
-  coding: ['GPT-5.3-Codex', 'Claude Code', 'Cursor', 'Windsurf', 'Agentic Coding', 'Tutorials'],
-  regulation: ['EU AI Act', 'US Policy', 'China AI Policy', 'Compliance Guides'],
-  science: ['Quantum Computing', 'Robotics', 'Edge AI', 'Research Papers'],
-};
+const footerSections = [
+  {
+    label: 'Models',
+    href: '/category/models',
+    items: ['GPT-4o', 'Claude 3.5', 'Gemini 1.5 Pro', 'Llama 3', 'Mistral', 'DeepSeek V2'],
+  },
+  {
+    label: 'Agents',
+    href: '/category/agents',
+    items: ['AutoGPT', 'Multi-Agent Systems', 'Enterprise Agents', 'Autonomous Workflows', 'AI Assistants'],
+  },
+  {
+    label: 'Tools',
+    href: '/category/tools',
+    items: ['Claude Code', 'Cursor', 'Windsurf', 'GitHub Copilot', 'AI APIs', 'Dev SDKs'],
+  },
+  {
+    label: 'Research',
+    href: '/category/research',
+    items: ['LLM Papers', 'Benchmarks', 'AI Alignment', 'AI Safety', 'Lab Breakthroughs'],
+  },
+  {
+    label: 'Business',
+    href: '/category/business',
+    items: ['Funding Rounds', 'Acquisitions', 'Partnerships', 'AI Valuations', 'IPOs'],
+  },
+  {
+    label: 'Policy',
+    href: '/category/policy',
+    items: ['EU AI Act', 'US AI Policy', 'China AI Rules', 'AI Governance', 'Compliance'],
+  },
+  {
+    label: 'Hardware',
+    href: '/category/hardware',
+    items: ['GPUs & Chips', 'Data Centers', 'Edge AI', 'NVIDIA', 'Compute Infrastructure'],
+  },
+  {
+    label: 'Learn',
+    href: '/category/learn',
+    items: ['AI Tutorials', 'Explainers', 'How-to Guides', 'AI Courses', 'Prompt Engineering'],
+  },
+];
 
 export default function Footer() {
   return (
     <footer className="bg-ai-space text-white">
       {/* Main Footer */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
+
           {/* Logo & Description */}
-          <div className="col-span-2 md:col-span-3 lg:col-span-1">
+          <div className="col-span-2 md:col-span-4 lg:col-span-1">
             <Link href="/" className="flex items-center gap-2 mb-4">
               <div className="w-7 h-7 ai-gradient-bg rounded-lg flex items-center justify-center">
                 <Cpu className="w-4 h-4 text-white" />
@@ -32,82 +67,26 @@ export default function Footer() {
             </p>
           </div>
 
-          {/* Models Links */}
-          <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wider mb-4 ai-gradient-text font-heading">Models</h3>
-            <ul className="space-y-2">
-              {footerLinks.models.map((link) => (
-                <li key={link}>
-                  <Link href="/category/models" className="text-sm text-gray-400 hover:text-ai-cyan transition-colors">
-                    {link}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Agents Links */}
-          <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wider mb-4 ai-gradient-text font-heading">Agents</h3>
-            <ul className="space-y-2">
-              {footerLinks.agents.map((link) => (
-                <li key={link}>
-                  <Link href="/category/agents" className="text-sm text-gray-400 hover:text-ai-cyan transition-colors">
-                    {link}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Industry Links */}
-          <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wider mb-4 ai-gradient-text font-heading">Industry</h3>
-            <ul className="space-y-2">
-              {footerLinks.industry.map((link) => (
-                <li key={link}>
-                  <Link href="/category/industry" className="text-sm text-gray-400 hover:text-ai-cyan transition-colors">
-                    {link}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* AI Coding Links */}
-          <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wider mb-4 ai-gradient-text font-heading">Coding</h3>
-            <ul className="space-y-2">
-              {footerLinks.coding.map((link) => (
-                <li key={link}>
-                  <Link href="/category/coding" className="text-sm text-gray-400 hover:text-ai-cyan transition-colors">
-                    {link}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* More Links */}
-          <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wider mb-4 ai-gradient-text font-heading">More</h3>
-            <ul className="space-y-2">
-              {footerLinks.regulation.map((link) => (
-                <li key={link}>
-                  <Link href={`/category/${link.toLowerCase().replace(/\s+/g, '-')}`} className="text-sm text-gray-400 hover:text-ai-cyan transition-colors">
-                    {link}
-                  </Link>
-                </li>
-              ))}
-              {footerLinks.science.map((link) => (
-                <li key={link}>
-                  <Link href={`/category/${link.toLowerCase().replace(/\s+/g, '-')}`} className="text-sm text-gray-400 hover:text-ai-cyan transition-colors">
-                    {link}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {/* Category Columns — 4 per row on lg */}
+          {footerSections.map((section) => (
+            <div key={section.label}>
+              <h3 className="text-sm font-semibold uppercase tracking-wider mb-4 ai-gradient-text font-heading">
+                {section.label}
+              </h3>
+              <ul className="space-y-2">
+                {section.items.map((item) => (
+                  <li key={item}>
+                    <Link
+                      href={section.href}
+                      className="text-sm text-gray-400 hover:text-ai-cyan transition-colors"
+                    >
+                      {item}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -116,11 +95,11 @@ export default function Footer() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-gray-400">
-              <Link href="/privacy" className="hover:text-ai-cyan transition-colors">Privacy Policy</Link>
-              <Link href="/terms" className="hover:text-ai-cyan transition-colors">Terms of Service</Link>
-              <Link href="/cookies" className="hover:text-ai-cyan transition-colors">Cookie Policy</Link>
+              <Link href="/privacy"      className="hover:text-ai-cyan transition-colors">Privacy Policy</Link>
+              <Link href="/terms"        className="hover:text-ai-cyan transition-colors">Terms of Service</Link>
+              <Link href="/cookies"      className="hover:text-ai-cyan transition-colors">Cookie Policy</Link>
               <Link href="/accessibility" className="hover:text-ai-cyan transition-colors">Accessibility</Link>
-              <Link href="/sitemap" className="hover:text-ai-cyan transition-colors">Sitemap</Link>
+              <Link href="/sitemap"      className="hover:text-ai-cyan transition-colors">Sitemap</Link>
             </div>
             <p className="text-sm text-gray-500 font-mono-ai">
               © {new Date().getFullYear()} AI Fresh Daily. All rights reserved.

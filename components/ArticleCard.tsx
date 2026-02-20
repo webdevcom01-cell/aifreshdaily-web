@@ -1,4 +1,5 @@
 "use client"
+import Link from 'next/link';
 import type { Article } from '@/types';
 
 interface ArticleCardProps {
@@ -13,12 +14,13 @@ function TagList({ tags }: { tags?: string[] }) {
   return (
     <div className="flex flex-wrap gap-1 mt-2">
       {tags.slice(0, 3).map((tag) => (
-        <span
+        <Link
           key={tag}
-          className="px-1.5 py-0.5 text-[10px] font-medium bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 rounded"
+          href={`/tag/${tag}`}
+          className="px-1.5 py-0.5 text-[10px] font-medium bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 rounded hover:bg-ai-purple/10 hover:text-ai-purple dark:hover:text-ai-cyan transition-colors"
         >
           #{tag}
-        </span>
+        </Link>
       ))}
     </div>
   );

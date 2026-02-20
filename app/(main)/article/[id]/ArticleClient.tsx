@@ -1,7 +1,7 @@
 "use client"
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { fetchArticleById, fetchByCategory } from '@/lib/supabase';
+import { fetchArticleById, fetchByCategory, incrementViewCount } from '@/lib/supabase';
 import { useBookmarks } from '@/hooks/useBookmarks';
 import type { Article } from '@/types';
 import {
@@ -37,6 +37,12 @@ export default function ArticleClient({ id, initialArticle }: Props) {
       .then((data) => setRelatedArticles(data.filter((a) => a.id !== article.id).slice(0, 3)))
       .catch(() => {});
   }, [article?.category, article?.id]);
+
+  // Increment view count once per article view (silently no-ops until migration runs)
+  useEffect(() => {
+    if (!article?.id) return;
+    incrementViewCount(article.id).catch(() => {});
+  }, [article?.id]);
 
   useEffect(() => {
     const handleScroll = () => {
