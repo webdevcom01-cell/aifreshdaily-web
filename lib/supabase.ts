@@ -211,6 +211,42 @@ export async function fetchByTag(tag: string, limit = 30): Promise<Article[]> {
   return (data as ArticleRow[]).map(mapRow);
 }
 
+/** Paginated fetch — used by IndustryDeepDive Load More */
+export async function fetchArticlesPaged(
+  category: string,
+  from: number,
+  to: number,
+): Promise<Article[]> {
+  let query = supabase
+    .from('articles')
+    .select('*')
+    .order('published_at', { ascending: false })
+    .range(from, to);
+
+  if (category !== 'all') {
+    query = query.eq('category', category);
+  }
+
+  const { data, error } = await query;
+  if (error) throw error;
+  return (data as ArticleRow[]).map(mapRow);
+}
+
+/** Subscribe an email address via SECURITY DEFINER RPC (bypasses RLS).
+ *  Returns null on success, error string on failure. */
+export async function subscribeEmail(email: string): Promise<string | null> {
+  const { data, error } = await supabase.rpc('subscribe_email', {
+    p_email: email.trim().toLowerCase(),
+  });
+
+  if (error) return error.message;
+  if (data?.success === false) {
+    if (data.error === 'invalid_email') return 'Please enter a valid email address.';
+    return data.error ?? 'Something went wrong.';
+  }
+  return null;
+}
+
 export async function fetchPopularTags(limit = 20): Promise<{ tag: string; count: number }[]> {
   // Fetch recent articles and count tag frequency client-side
   const { data, error } = await supabase

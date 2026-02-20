@@ -171,11 +171,17 @@ export default function ArticleClient({ id, initialArticle }: Props) {
           </div>
         )}
 
-        {/* Tags */}
+        {/* Tags — clickable, link to /tag/[slug] */}
         {article.tags && article.tags.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-8">
             {article.tags.map((tag) => (
-              <span key={tag} className="px-3 py-1 text-xs font-medium bg-secondary text-muted-foreground rounded-full border border-border">#{tag}</span>
+              <Link
+                key={tag}
+                href={`/tag/${tag}`}
+                className="px-3 py-1 text-xs font-medium bg-secondary text-muted-foreground rounded-full border border-border hover:border-primary/50 hover:text-primary hover:bg-primary/5 transition-all"
+              >
+                #{tag}
+              </Link>
             ))}
           </div>
         )}

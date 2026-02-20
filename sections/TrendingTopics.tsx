@@ -16,16 +16,21 @@ export default function TrendingTopics() {
       .catch(() => setIsLoading(false));
   }, []);
 
-  // Format tag label: "openai" → "OpenAI", "gpt-4o" → "GPT-4o"
+  // Format tag label: "openai" → "OpenAI", "gpt-4o" → "GPT-4o", "generative-ai" → "Generative AI"
+  // "claude-3-5-sonnet" → "Claude-3-5-Sonnet" (once in version region, hyphens persist)
   function formatTag(tag: string): string {
-    return tag
-      .split('-')
-      .map((word) =>
-        ['openai', 'gpt', 'llm', 'ai', 'api', 'agi', 'rlhf', 'llms', 'gpu', 'tpu'].includes(word.toLowerCase())
-          ? word.toUpperCase()
-          : word.charAt(0).toUpperCase() + word.slice(1)
-      )
-      .join(' ');
+    const upper = ['openai', 'gpt', 'llm', 'ai', 'api', 'agi', 'rlhf', 'llms', 'gpu', 'tpu'];
+    const parts = tag.split('-');
+    let inVersion = false;
+    return parts.reduce((acc, word, i) => {
+      const fmt = upper.includes(word.toLowerCase())
+        ? word.toUpperCase()
+        : word.charAt(0).toUpperCase() + word.slice(1);
+      if (i === 0) return fmt;
+      if (/^\d/.test(word)) inVersion = true;
+      const sep = inVersion ? '-' : ' ';
+      return acc + sep + fmt;
+    }, '');
   }
 
   if (isLoading) {

@@ -29,12 +29,19 @@ async function getTrending() {
   return trendingCache;
 }
 
-// ── Format tag label: "openai" → "OpenAI" ────────────────────────────────
+// ── Format tag label: "openai" → "OpenAI", "gpt-4o" → "GPT-4o" ──────────
+// "claude-3-5-sonnet" → "Claude-3-5-Sonnet" (once in version region, hyphens persist)
 function fmtTag(tag: string): string {
   const upper = ['openai', 'gpt', 'llm', 'ai', 'api', 'agi', 'gpu', 'tpu', 'llms', 'rlhf'];
-  return tag.split('-').map((w) =>
-    upper.includes(w.toLowerCase()) ? w.toUpperCase() : w.charAt(0).toUpperCase() + w.slice(1)
-  ).join(' ');
+  const parts = tag.split('-');
+  let inVersion = false;
+  return parts.reduce((acc, w, i) => {
+    const fmt = upper.includes(w.toLowerCase()) ? w.toUpperCase() : w.charAt(0).toUpperCase() + w.slice(1);
+    if (i === 0) return fmt;
+    if (/^\d/.test(w)) inVersion = true;
+    const sep = inVersion ? '-' : ' ';
+    return acc + sep + fmt;
+  }, '');
 }
 
 // ── Types ─────────────────────────────────────────────────────────────────
