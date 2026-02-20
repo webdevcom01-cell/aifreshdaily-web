@@ -9,6 +9,7 @@ export default function AIVoicesSection() {
     const [activeIndex, setActiveIndex] = useState(0);
     const [isPaused, setIsPaused] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(false);
 
     useEffect(() => {
         fetchAIVoices()
@@ -18,7 +19,7 @@ export default function AIVoicesSection() {
                     setActiveIndex(0);
                 }
             })
-            .catch(() => {})
+            .catch(() => { setError(true); })
             .finally(() => setLoading(false));
     }, []);
 
@@ -65,6 +66,9 @@ export default function AIVoicesSection() {
             </section>
         );
     }
+
+    // Empty state — hide section cleanly if no voices in DB
+    if (!loading && (voices.length === 0 || error)) return null;
 
     const voice = voices[activeIndex] ?? voices[0];
     if (!voice) return null;
