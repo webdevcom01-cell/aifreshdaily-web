@@ -2,34 +2,24 @@
 import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Filter, TrendingUp, Clock, Flame } from 'lucide-react';
-import { fetchArticles } from '@/lib/supabase';
+import { fetchByCategory } from '@/lib/supabase';
 import { useBookmarks } from '@/hooks/useBookmarks';
 import type { Article } from '@/types';
 
 const categoryMeta: Record<string, { label: string; description: string; icon: string }> = {
-  models:     { label: 'Models & LLMs',  description: 'The latest large language models, architectures, and benchmark results from OpenAI, Anthropic, Google, and more.', icon: '🧠' },
-  agents:     { label: 'AI Agents',      description: 'Multi-agent systems, autonomous workflows, and the rise of agentic AI across enterprise and consumer platforms.', icon: '🤖' },
-  industry:   { label: 'Industry',       description: 'How AI is transforming healthcare, finance, legal, education, manufacturing, and every sector in between.', icon: '🏢' },
-  coding:     { label: 'AI Coding',      description: 'Agentic coding tools, AI-assisted development, and the future of software engineering.', icon: '💻' },
-  regulation: { label: 'Regulation',     description: 'Global AI policy, the EU AI Act, and the evolving regulatory landscape for artificial intelligence.', icon: '⚖️' },
-  science:    { label: 'Science',        description: 'Quantum computing, robotics, edge AI, and cutting-edge research at the frontier of technology.', icon: '🔬' },
-  education:  { label: 'AI Academy',     description: 'Tutorials, explainers, and educational content for understanding AI — from beginner to advanced.', icon: '📚' },
-  video:      { label: 'Video',          description: 'Demos, comparisons, deep dives, and explainer videos covering the AI landscape.', icon: '🎬' },
+  models:   { label: 'Models & LLMs', description: 'The latest large language models, architectures, and benchmark results from OpenAI, Anthropic, Google, and more.', icon: '🧠' },
+  agents:   { label: 'AI Agents',     description: 'Multi-agent systems, autonomous workflows, and the rise of agentic AI across enterprise and consumer platforms.', icon: '🤖' },
+  tools:    { label: 'Tools',         description: 'AI apps, APIs, SDKs, developer tools, and AI-powered products shaping how we build and work.', icon: '🛠️' },
+  research: { label: 'Research',      description: 'Academic papers, lab breakthroughs, and scientific studies pushing the frontier of AI.', icon: '🔬' },
+  business: { label: 'Business',      description: 'Funding rounds, acquisitions, partnerships, and the market forces driving the AI economy.', icon: '💼' },
+  policy:   { label: 'Policy',        description: 'Global AI regulation, governance, ethics, safety policy, and the evolving legal landscape.', icon: '⚖️' },
+  hardware: { label: 'Hardware',      description: 'Chips, GPUs, data centers, edge AI, and the compute infrastructure powering the AI revolution.', icon: '⚙️' },
+  learn:    { label: 'Learn',         description: 'Tutorials, explainers, courses, and how-to guides — AI knowledge for every level.', icon: '📚' },
 };
 
 function matchesCategory(article: Article, slug: string): boolean {
   const cat = article.category.toLowerCase();
-  switch (slug) {
-    case 'models':     return cat.includes('model') || cat.includes('llm') || cat.includes('benchmark') || cat.includes('research');
-    case 'agents':     return cat.includes('agent');
-    case 'industry':   return cat.includes('industry') || cat.includes('healthcare') || cat.includes('finance') || cat.includes('legal');
-    case 'coding':     return cat.includes('coding') || cat.includes('code');
-    case 'regulation': return cat.includes('regulation') || cat.includes('policy');
-    case 'science':    return cat.includes('science') || cat.includes('quantum') || cat.includes('robotics');
-    case 'education':  return cat.includes('academy') || cat.includes('education');
-    case 'video':      return cat.includes('video') || cat.includes('demo');
-    default:           return cat.includes(slug);
-  }
+  return cat === slug || cat.includes(slug);
 }
 
 type SortType = 'latest' | 'trending' | 'popular';
@@ -41,13 +31,14 @@ export default function CategoryClient({ slug }: { slug: string }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchArticles(100).then(setSourceArticles).catch(() => {}).finally(() => setLoading(false));
-  }, []);
+    fetchByCategory(slug, 40).then(setSourceArticles).catch(() => {}).finally(() => setLoading(false));
+  }, [slug]);
 
   const meta = categoryMeta[slug];
   const label = meta?.label || slug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 
-  const articles = useMemo(() => sourceArticles.filter((a) => matchesCategory(a, slug)), [slug, sourceArticles]);
+  // DB already filtered by category — no client-side re-filter needed
+  const articles = useMemo(() => sourceArticles, [sourceArticles]);
 
   const sortedArticles = useMemo(() => {
     const arr = [...articles];
@@ -128,6 +119,18 @@ export default function CategoryClient({ slug }: { slug: string }) {
             <div className="p-6 lg:p-8 flex flex-col justify-center">
               <span className="text-xs font-bold uppercase tracking-wider text-primary mb-3">{featured.category}</span>
               <h2 className="text-xl sm:text-2xl font-heading font-bold text-foreground group-hover:text-primary transition-colors mb-3">{featured.headline}</h2>
+              {featured.tags && featured.tags.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mb-3">
+                  {featured.tags.slice(0, 4).map((tag) => (
+                    <span key={tag} onClick={(e) => e.stopPropagation()}>
+                      <Link href={`/tag/${tag}`}
+                        className="text-xs px-2 py-0.5 rounded-full bg-secondary border border-border text-muted-foreground hover:text-primary hover:border-primary/40 transition-colors">
+                        #{tag}
+                      </Link>
+                    </span>
+                  ))}
+                </div>
+              )}
               <div className="flex items-center gap-3 text-sm text-muted-foreground">
                 {featured.author && <span>{featured.author}</span>}
                 {featured.readTime && <span>· {featured.readTime}</span>}
@@ -159,6 +162,18 @@ export default function CategoryClient({ slug }: { slug: string }) {
             <div className="p-4">
               <span className="text-xs font-bold uppercase tracking-wider text-primary mb-2 block">{article.category}</span>
               <h3 className="text-sm font-heading font-bold text-foreground group-hover:text-primary transition-colors line-clamp-2 mb-2">{article.headline}</h3>
+              {article.tags && article.tags.length > 0 && (
+                <div className="flex flex-wrap gap-1 mb-2">
+                  {article.tags.slice(0, 3).map((tag) => (
+                    <span key={tag} onClick={(e) => e.stopPropagation()}>
+                      <Link href={`/tag/${tag}`}
+                        className="text-[10px] px-1.5 py-0.5 rounded-full bg-secondary border border-border text-muted-foreground hover:text-primary hover:border-primary/40 transition-colors">
+                        #{tag}
+                      </Link>
+                    </span>
+                  ))}
+                </div>
+              )}
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 {article.readTime && <span>{article.readTime}</span>}
                 {article.publishedAt && <span>· {article.publishedAt}</span>}

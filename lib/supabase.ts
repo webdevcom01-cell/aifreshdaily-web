@@ -188,3 +188,35 @@ export async function fetchAllArticleIds(): Promise<string[]> {
   if (error) return [];
   return (data as { id: string }[]).map((row) => row.id);
 }
+
+export async function fetchByTag(tag: string, limit = 30): Promise<Article[]> {
+  const { data, error } = await supabase
+    .from('articles')
+    .select('*')
+    .contains('tags', [tag])
+    .order('published_at', { ascending: false })
+    .limit(limit);
+  if (error) throw error;
+  return (data as ArticleRow[]).map(mapRow);
+}
+
+export async function fetchPopularTags(limit = 20): Promise<{ tag: string; count: number }[]> {
+  // Fetch recent articles and count tag frequency client-side
+  const { data, error } = await supabase
+    .from('articles')
+    .select('tags')
+    .not('tags', 'is', null)
+    .order('published_at', { ascending: false })
+    .limit(200);
+  if (error) return [];
+  const freq: Record<string, number> = {};
+  for (const row of data as { tags: string[] | null }[]) {
+    for (const t of row.tags ?? []) {
+      freq[t] = (freq[t] ?? 0) + 1;
+    }
+  }
+  return Object.entries(freq)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, limit)
+    .map(([tag, count]) => ({ tag, count }));
+}

@@ -2,14 +2,14 @@ import type { Metadata } from 'next';
 import CategoryClient from './CategoryClient';
 
 const categoryMeta: Record<string, { label: string; description: string }> = {
-  models:     { label: 'Models & LLMs',  description: 'The latest large language models, architectures, and benchmark results from OpenAI, Anthropic, Google, and more.' },
-  agents:     { label: 'AI Agents',      description: 'Multi-agent systems, autonomous workflows, and the rise of agentic AI across enterprise and consumer platforms.' },
-  industry:   { label: 'Industry',       description: 'How AI is transforming healthcare, finance, legal, education, manufacturing, and every sector in between.' },
-  coding:     { label: 'AI Coding',      description: 'Agentic coding tools, AI-assisted development, and the future of software engineering.' },
-  regulation: { label: 'Regulation',     description: 'Global AI policy, the EU AI Act, and the evolving regulatory landscape for artificial intelligence.' },
-  science:    { label: 'Science',        description: 'Quantum computing, robotics, edge AI, and cutting-edge research at the frontier of technology.' },
-  education:  { label: 'AI Academy',     description: 'Tutorials, explainers, and educational content for understanding AI — from beginner to advanced.' },
-  video:      { label: 'Video',          description: 'Demos, comparisons, deep dives, and explainer videos covering the AI landscape.' },
+  models:   { label: 'Models & LLMs', description: 'The latest large language models, architectures, and benchmark results from OpenAI, Anthropic, Google, and more.' },
+  agents:   { label: 'AI Agents',     description: 'Multi-agent systems, autonomous workflows, and the rise of agentic AI across enterprise and consumer platforms.' },
+  tools:    { label: 'Tools',         description: 'AI apps, APIs, SDKs, developer tools, and AI-powered products shaping how we build and work.' },
+  research: { label: 'Research',      description: 'Academic papers, lab breakthroughs, and scientific studies pushing the frontier of AI.' },
+  business: { label: 'Business',      description: 'Funding rounds, acquisitions, partnerships, and the market forces driving the AI economy.' },
+  policy:   { label: 'Policy',        description: 'Global AI regulation, governance, ethics, safety policy, and the evolving legal landscape.' },
+  hardware: { label: 'Hardware',      description: 'Chips, GPUs, data centers, edge AI, and the compute infrastructure powering the AI revolution.' },
+  learn:    { label: 'Learn',         description: 'Tutorials, explainers, courses, and how-to guides — AI knowledge for every level.' },
 };
 
 export async function generateMetadata(
