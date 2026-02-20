@@ -1,7 +1,7 @@
 "use client"
 import { useState, useEffect, useMemo } from 'react';
-import { Trophy, ArrowUp, ArrowDown, Minus, Cpu } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { Trophy, ArrowUp, ArrowDown, Minus, Cpu, ThumbsUp } from 'lucide-react';
+import { supabase, voteForModel } from '@/lib/supabase';
 
 interface ModelScore {
   id: number;
@@ -11,6 +11,7 @@ interface ModelScore {
   score_coding: number;
   score_reasoning: number;
   score_creative: number;
+  vote_count: number;
   context_window: string;
   highlight: string | null;
   trend: 'up' | 'down' | 'same';
@@ -19,6 +20,15 @@ interface ModelScore {
 
 const CATEGORIES = ['Overall', 'Coding', 'Reasoning', 'Creative'] as const;
 type Category = typeof CATEGORIES[number];
+
+const VOTE_KEY = (id: number) => `afd-voted-model-${id}`;
+
+function hasVoted(id: number): boolean {
+  try { return localStorage.getItem(VOTE_KEY(id)) === '1'; } catch { return false; }
+}
+function markVoted(id: number) {
+  try { localStorage.setItem(VOTE_KEY(id), '1'); } catch { /* noop */ }
+}
 
 function getScore(model: ModelScore, cat: Category): number {
   const map: Record<Category, keyof ModelScore> = {
@@ -31,9 +41,11 @@ function getScore(model: ModelScore, cat: Category): number {
 }
 
 export default function ModelScoreboard() {
-  const [models, setModels] = useState<ModelScore[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [models, setModels]             = useState<ModelScore[]>([]);
+  const [isLoading, setIsLoading]       = useState(true);
   const [activeCategory, setActiveCategory] = useState<Category>('Overall');
+  // voted: modelId → localVoteCount delta (0 or 1)
+  const [votes, setVotes]               = useState<Record<number, number>>({});
 
   useEffect(() => {
     supabase
@@ -46,11 +58,26 @@ export default function ModelScoreboard() {
       });
   }, []);
 
+  // Initialise votes from localStorage after models load
+  useEffect(() => {
+    if (models.length === 0) return;
+    const init: Record<number, number> = {};
+    models.forEach((m) => { if (hasVoted(m.id)) init[m.id] = 1; });
+    setVotes(init);
+  }, [models]);
+
+  const handleVote = (modelId: number) => {
+    if (votes[modelId]) return; // already voted
+    markVoted(modelId);
+    setVotes((prev) => ({ ...prev, [modelId]: 1 }));
+    voteForModel(modelId).catch(() => {}); // fire-and-forget
+  };
+
   const ranked = useMemo(() =>
     [...models]
       .sort((a, b) => getScore(b, activeCategory) - getScore(a, activeCategory))
       .map((m, i) => ({ ...m, displayRank: i + 1 })),
-    [models, activeCategory]
+    [models, activeCategory],
   );
 
   const updatedAt = models[0]?.updated_at
@@ -109,21 +136,27 @@ export default function ModelScoreboard() {
 
       {/* Table */}
       <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
-        <div className="min-w-[640px] sm:min-w-full rounded-xl border border-gray-200 dark:border-white/10 overflow-hidden bg-white dark:bg-white/[0.02]">
+        {/* grid: # | Model | Company | Score | Context | Trend | Vote */}
+        <div className="min-w-[680px] sm:min-w-full rounded-xl border border-gray-200 dark:border-white/10 overflow-hidden bg-white dark:bg-white/[0.02]">
           <div className="grid grid-cols-12 gap-2 px-4 py-3 bg-gray-50 dark:bg-white/5 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
             <div className="col-span-1">#</div>
-            <div className="col-span-4">Model</div>
+            <div className="col-span-3">Model</div>
             <div className="col-span-2">Company</div>
             <div className="col-span-3">{activeCategory} Score</div>
             <div className="col-span-1">Context</div>
-            <div className="col-span-1 text-right">Trend</div>
+            <div className="col-span-1 text-center">Trend</div>
+            <div className="col-span-1 text-center">Vote</div>
           </div>
 
           {ranked.map((model, index) => {
-            const score = getScore(model, activeCategory);
+            const score    = getScore(model, activeCategory);
+            const voted    = !!votes[model.id];
+            const voteDisp = (model.vote_count ?? 0) + (votes[model.id] ?? 0);
+
             return (
               <div key={model.id}
                 className={`grid grid-cols-12 gap-2 px-4 py-3.5 items-center border-t border-gray-100 dark:border-white/5 transition-colors hover:bg-gray-50 dark:hover:bg-white/[0.03] animate-fade-in-up stagger-${index + 1}`}>
+                {/* Rank */}
                 <div className="col-span-1">
                   <span className={`font-heading font-bold text-lg ${
                     model.displayRank === 1 ? 'ai-gradient-text' :
@@ -132,7 +165,8 @@ export default function ModelScoreboard() {
                     {model.displayRank}
                   </span>
                 </div>
-                <div className="col-span-4">
+                {/* Model name */}
+                <div className="col-span-3">
                   <div className="flex items-center gap-2">
                     <Cpu className="w-4 h-4 text-ai-purple dark:text-ai-cyan flex-shrink-0 hidden sm:block" />
                     <div>
@@ -145,7 +179,9 @@ export default function ModelScoreboard() {
                     </div>
                   </div>
                 </div>
+                {/* Company */}
                 <div className="col-span-2 text-sm text-gray-500 dark:text-gray-400 truncate">{model.company}</div>
+                {/* Score bar */}
                 <div className="col-span-3">
                   <div className="flex items-center gap-2">
                     <div className="flex-1 h-2 bg-gray-100 dark:bg-white/10 rounded-full overflow-hidden">
@@ -156,15 +192,37 @@ export default function ModelScoreboard() {
                     </span>
                   </div>
                 </div>
+                {/* Context */}
                 <div className="col-span-1">
                   <span className="text-xs font-mono-ai px-1.5 py-0.5 rounded bg-cyan-50 dark:bg-cyan-500/10 text-cyan-600 dark:text-cyan-300">
                     {model.context_window}
                   </span>
                 </div>
-                <div className="col-span-1 text-right">
+                {/* Trend */}
+                <div className="col-span-1 text-center">
                   {model.trend === 'up'   && <ArrowUp   className="w-4 h-4 text-green-500 inline-block" />}
                   {model.trend === 'down' && <ArrowDown className="w-4 h-4 text-red-500   inline-block" />}
                   {model.trend === 'same' && <Minus     className="w-4 h-4 text-gray-400  inline-block" />}
+                </div>
+                {/* Vote button */}
+                <div className="col-span-1 flex flex-col items-center gap-0.5">
+                  <button
+                    onClick={() => handleVote(model.id)}
+                    disabled={voted}
+                    aria-label={voted ? 'Already voted' : `Vote for ${model.name}`}
+                    className={`p-1.5 rounded-lg transition-all ${
+                      voted
+                        ? 'text-ai-purple bg-purple-100 dark:bg-purple-500/20 cursor-default'
+                        : 'text-gray-400 hover:text-ai-purple hover:bg-purple-50 dark:hover:bg-purple-500/10 cursor-pointer'
+                    }`}
+                  >
+                    <ThumbsUp className="w-3.5 h-3.5" />
+                  </button>
+                  {voteDisp > 0 && (
+                    <span className="text-[10px] font-mono-ai text-gray-400 dark:text-gray-500 leading-none">
+                      {voteDisp}
+                    </span>
+                  )}
                 </div>
               </div>
             );
@@ -174,6 +232,7 @@ export default function ModelScoreboard() {
 
       <div className="mt-3 flex justify-between items-center text-xs text-gray-400 dark:text-gray-500">
         <span className="font-mono-ai">Updated {updatedAt} — Community benchmark scores</span>
+        <span className="font-mono-ai">Vote for your favourite model</span>
       </div>
     </section>
   );

@@ -291,3 +291,40 @@ export async function fetchMostPopular(limit = 5): Promise<Article[]> {
 export async function incrementViewCount(articleId: string): Promise<void> {
   await supabase.rpc('increment_view_count', { article_id: articleId });
 }
+
+/** Increment vote_count for a model via SECURITY DEFINER RPC.
+ *  Silently no-ops if the RPC or column don't exist yet. */
+export async function voteForModel(modelId: number): Promise<void> {
+  await supabase.rpc('vote_for_model', { p_model_id: modelId });
+}
+
+/** Find articles with overlapping tags (PostgreSQL && operator).
+ *  Falls back to same category if there are no tag matches or tags is empty. */
+export async function fetchRelatedByTags(
+  tags: string[],
+  excludeId: string,
+  category: string,
+  limit = 3,
+): Promise<Article[]> {
+  if (tags.length > 0) {
+    const { data, error } = await supabase
+      .from('articles')
+      .select('*')
+      .overlaps('tags', tags)
+      .neq('id', excludeId)
+      .order('published_at', { ascending: false })
+      .limit(limit);
+    if (!error && data && data.length > 0) {
+      return (data as ArticleRow[]).map(mapRow);
+    }
+  }
+  // Fall back to same-category when no tag matches or tags array is empty
+  const { data } = await supabase
+    .from('articles')
+    .select('*')
+    .eq('category', category)
+    .neq('id', excludeId)
+    .order('published_at', { ascending: false })
+    .limit(limit);
+  return ((data ?? []) as ArticleRow[]).map(mapRow);
+}
