@@ -8,6 +8,7 @@ const SITE_DESCRIPTION =
 
 interface ArticleRow {
   id: string;
+  slug: string | null;
   headline: string;
   excerpt: string | null;
   category: string;
@@ -33,7 +34,7 @@ export async function GET() {
 
   const { data } = await supabase
     .from('articles')
-    .select('id, headline, excerpt, category, published_at, tags, image')
+    .select('id, slug, headline, excerpt, category, published_at, tags, image')
     .order('published_at', { ascending: false })
     .limit(50);
 
@@ -41,7 +42,7 @@ export async function GET() {
 
   const items = articles
     .map((a) => {
-      const url = `${SITE_URL}/article/${a.id}`;
+      const url = `${SITE_URL}/article/${a.slug ?? a.id}`;
       const pubDate = a.published_at
         ? new Date(a.published_at).toUTCString()
         : new Date().toUTCString();

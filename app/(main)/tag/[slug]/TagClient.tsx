@@ -2,7 +2,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Tag, Clock, TrendingUp, Flame } from 'lucide-react';
-import { fetchByTag, fetchPopularTags } from '@/lib/supabase';
+import { fetchByTag, fetchPopularTags , articlePath } from '@/lib/supabase';
 import { useBookmarks } from '@/hooks/useBookmarks';
 import type { Article } from '@/types';
 
@@ -126,7 +126,7 @@ export default function TagClient({ slug }: { slug: string }) {
 
       {/* Featured */}
       {!loading && featured && (
-        <Link href={`/article/${featured.id}`}
+        <Link href={articlePath(featured)}
           className="group block mb-8 rounded-xl overflow-hidden border border-border hover:border-primary/30 transition-all hover:shadow-xl bg-card">
           <div className="grid grid-cols-1 lg:grid-cols-2">
             {featured.image && (
@@ -168,7 +168,7 @@ export default function TagClient({ slug }: { slug: string }) {
       {!loading && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {rest.map((article) => (
-            <Link key={article.id} href={`/article/${article.id}`}
+            <Link key={article.id} href={articlePath(article)}
               className="group block bg-card rounded-xl overflow-hidden border border-border hover:border-primary/30 transition-all hover:shadow-lg">
               {article.image && (
                 <div className="aspect-video overflow-hidden relative">

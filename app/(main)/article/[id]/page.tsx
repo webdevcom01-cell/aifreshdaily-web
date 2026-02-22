@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
-import { fetchArticleById } from '@/lib/supabase';
+import { fetchArticleBySlugOrId, articlePath } from '@/lib/supabase';
+import type { Article } from '@/types';
 import ArticleClient from './ArticleClient';
 
 const SITE_URL = 'https://aifreshdaily.com';
@@ -9,21 +10,21 @@ export async function generateMetadata(
   { params }: { params: Promise<{ id: string }> }
 ): Promise<Metadata> {
   const { id } = await params;
-  const article = await fetchArticleById(id);
+  const article = await fetchArticleBySlugOrId(id);
   if (!article) {
     return { title: 'Article Not Found | AI Fresh Daily' };
   }
 
   const summary = article.summary || article.excerpt || article.headline;
   const description = summary.slice(0, 160);
-  const url = `${SITE_URL}/article/${id}`;
+  const canonicalUrl = `${SITE_URL}${articlePath(article)}`;
 
   return {
     title: article.headline,
     description,
     openGraph: {
       type: 'article',
-      url,
+      url: canonicalUrl,
       title: article.headline,
       description,
       images: article.image ? [{ url: article.image, width: 1200, height: 630 }] : [],
@@ -38,18 +39,18 @@ export async function generateMetadata(
       description,
       images: article.image ? [article.image] : [],
     },
-    alternates: { canonical: url },
+    alternates: { canonical: canonicalUrl },
   };
 }
 
 // ── JSON-LD structured data ───────────────────────────────────────────
-function ArticleJsonLd({ article }: { article: NonNullable<Awaited<ReturnType<typeof fetchArticleById>>> }) {
+function ArticleJsonLd({ article }: { article: Article }) {
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'NewsArticle',
     headline: article.headline,
     description: (article.summary || article.excerpt || '').slice(0, 200),
-    url: `${SITE_URL}/article/${article.id}`,
+    url: `${SITE_URL}${articlePath(article)}`,
     image: article.image || `${SITE_URL}/og-image.png`,
     datePublished: article.publishedAt || new Date().toISOString(),
     author: { '@type': 'Person', name: article.author || 'AI Fresh Daily Editorial' },
@@ -74,7 +75,7 @@ export default async function ArticlePage(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const article = await fetchArticleById(id);
+  const article = await fetchArticleBySlugOrId(id);
 
   return (
     <>

@@ -1,6 +1,6 @@
 "use client"
 import { useState, useEffect } from 'react';
-import { fetchByCategory } from '@/lib/supabase';
+import { fetchByCategory , articlePath } from '@/lib/supabase';
 import type { Article } from '@/types';
 import { GraduationCap, BookOpen, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
@@ -48,7 +48,7 @@ export default function GreatReads() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {articles.map((article) => (
-              <Link key={article.id} href={`/article/${article.id}`} className="group cursor-pointer bg-white dark:bg-ai-space rounded-xl border border-gray-200 dark:border-ai-space-medium overflow-hidden hover:border-ai-purple/30 dark:hover:border-ai-cyan/30 hover:shadow-ai-glow-sm transition-all">
+              <Link key={article.id} href={articlePath(article)} className="group cursor-pointer bg-white dark:bg-ai-space rounded-xl border border-gray-200 dark:border-ai-space-medium overflow-hidden hover:border-ai-purple/30 dark:hover:border-ai-cyan/30 hover:shadow-ai-glow-sm transition-all">
                 <div className="relative overflow-hidden">
                   <img src={article.image} alt={article.headline} className="w-full aspect-[16/10] object-cover transition-transform duration-300 group-hover:scale-[1.03]" />
                   {(article as any).difficulty && (

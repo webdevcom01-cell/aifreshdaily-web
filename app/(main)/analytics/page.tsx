@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { createClient } from '@supabase/supabase-js';
 import { BarChart2, Eye, FileText, Tag, Trophy, Users } from 'lucide-react';
+import { articlePath } from '@/lib/supabase';
 
 export const metadata: Metadata = {
   title: 'Site Analytics | AI Fresh Daily',
@@ -133,7 +134,7 @@ export default async function AnalyticsPage() {
             {top.map((a, i) => {
               const pct = maxViews > 0 ? ((a.view_count ?? 0) / maxViews) * 100 : 0;
               return (
-                <a key={a.id} href={`/article/${a.id}`}
+                <a key={a.id} href={articlePath(a)}
                   className="block p-3 rounded-lg border border-border hover:border-primary/30 hover:bg-secondary/40 transition-colors group">
                   <div className="flex items-start gap-3">
                     <span className="text-xs font-mono-ai font-bold text-muted-foreground w-5 flex-shrink-0 pt-0.5">

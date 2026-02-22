@@ -1,13 +1,13 @@
 "use client"
 import { useState, useEffect, Fragment } from 'react';
 import Link from 'next/link';
-import { fetchArticleById, fetchRelatedByTags, incrementViewCount } from '@/lib/supabase';
+import { fetchArticleById, fetchRelatedByTags, incrementViewCount , articlePath } from '@/lib/supabase';
 import { useBookmarks } from '@/hooks/useBookmarks';
 import type { Article } from '@/types';
 import {
   ArrowLeft, Clock, User, Calendar, Share2, Twitter, Linkedin,
   Link as LinkIcon, Bookmark, BookmarkCheck,
-  Sparkles, CheckCircle2, Lightbulb,
+  Sparkles, CheckCircle2, Lightbulb, Bot,
 } from 'lucide-react';
 
 function generateFallbackSummary(article: Article): string {
@@ -133,6 +133,24 @@ export default function ArticleClient({ id, initialArticle }: Props) {
           </div>
         )}
 
+        {/* AI-Generated Disclaimer */}
+        <div className="flex items-center gap-2 px-4 py-2.5 mb-6 rounded-lg bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20">
+          <Bot className="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+          <p className="text-xs text-amber-700 dark:text-amber-300">
+            This article was written by AI based on multiple news sources.
+            {article.originalUrl && (
+              <a
+                href={article.originalUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline ml-1 hover:text-amber-800 dark:hover:text-amber-200 transition-colors"
+              >
+                Read original source →
+              </a>
+            )}
+          </p>
+        </div>
+
         {/* Full Article Body */}
         {article.body ? (
           <div className="prose prose-lg dark:prose-invert max-w-none mb-8 text-foreground/90 leading-relaxed">
@@ -233,7 +251,7 @@ export default function ArticleClient({ id, initialArticle }: Props) {
             <h2 className="text-2xl font-heading font-bold text-foreground mb-6">Related Articles</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {relatedArticles.map((related) => (
-                <Link key={related.id} href={`/article/${related.id}`}
+                <Link key={related.id} href={articlePath(related)}
                   className="group block bg-card rounded-xl overflow-hidden border border-border hover:border-primary/30 transition-all hover:shadow-lg">
                   {related.image && (
                     <div className="aspect-video overflow-hidden">

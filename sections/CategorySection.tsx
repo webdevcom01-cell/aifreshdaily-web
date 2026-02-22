@@ -1,5 +1,6 @@
 "use client"
 import Link from 'next/link';
+import { articlePath } from '@/lib/supabase';
 import type { Article } from '@/types';
 
 interface CategorySectionProps {
@@ -41,7 +42,7 @@ export default function CategorySection({ title, articles, icon, viewAllHref }: 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Main Article */}
           <div className="lg:col-span-7">
-            <Link href={`/article/${mainArticle.id}`} className="group block cursor-pointer">
+            <Link href={articlePath(mainArticle)} className="group block cursor-pointer">
               <div className="relative overflow-hidden rounded-xl">
                 <img
                   src={mainArticle.image}
@@ -68,7 +69,7 @@ export default function CategorySection({ title, articles, icon, viewAllHref }: 
             {sideArticles.map((article, index) => (
               <Link
                 key={article.id}
-                href={`/article/${article.id}`}
+                href={articlePath(article)}
                 className={`group block ${index !== sideArticles.length - 1 ? 'pb-5 border-b border-gray-200 dark:border-ai-space-medium' : ''
                   }`}
               >

@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Bookmark, BookmarkX, Trash2 } from 'lucide-react';
 import { useBookmarks } from '@/hooks/useBookmarks';
-import { fetchArticleById } from '@/lib/supabase';
+import { fetchArticleById , articlePath } from '@/lib/supabase';
 import type { Article } from '@/types';
 
 export default function BookmarksPage() {
@@ -59,7 +59,7 @@ export default function BookmarksPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {savedArticles.map((article) => (
           <div key={article.id} className="group bg-card rounded-xl overflow-hidden border border-border hover:border-primary/30 transition-all hover:shadow-lg relative">
-            <Link href={`/article/${article.id}`}>
+            <Link href={articlePath(article)}>
               {article.image && (
                 <div className="aspect-video overflow-hidden">
                   <img src={article.image} alt={article.headline} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />

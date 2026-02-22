@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Play, Film, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
-import { fetchVideoArticles } from '@/lib/supabase';
+import { fetchVideoArticles , articlePath } from '@/lib/supabase';
 import type { Article } from '@/types';
 
 export default function VideosSection() {
@@ -50,7 +50,7 @@ export default function VideosSection() {
             {videos.map((video) => (
               <Link
                 key={video.id}
-                href={`/article/${video.id}`}
+                href={articlePath(video)}
                 className="group cursor-pointer"
               >
                 <div className="relative overflow-hidden rounded-xl">

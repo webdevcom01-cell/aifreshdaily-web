@@ -1,7 +1,7 @@
 "use client"
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { fetchArticles } from '@/lib/supabase';
+import { fetchArticles , articlePath } from '@/lib/supabase';
 import { Clock } from 'lucide-react';
 import type { Article } from '@/types';
 
@@ -47,7 +47,7 @@ export default function LatestNews() {
           {articles.map((article) => (
             <div key={article.id} className="group">
               {/* Clickable area: image + headline + meta */}
-              <Link href={`/article/${article.id}`} className="block cursor-pointer">
+              <Link href={articlePath(article)} className="block cursor-pointer">
                 <div className="relative overflow-hidden rounded-xl">
                   <img
                     src={article.image}

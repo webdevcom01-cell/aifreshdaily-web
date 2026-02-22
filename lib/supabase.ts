@@ -10,6 +10,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 interface ArticleRow {
   id: string;
+  slug: string | null;
   headline: string;
   excerpt: string | null;
   summary: string | null;
@@ -41,6 +42,7 @@ function mapRow(row: ArticleRow): Article {
 
   return {
     id: row.id,
+    slug: row.slug ?? undefined,
     headline: row.headline,
     excerpt: row.excerpt ?? undefined,
     summary: row.summary ?? undefined,
@@ -103,6 +105,31 @@ export async function fetchArticleById(id: string): Promise<Article | null> {
     .single();
   if (error) return null;
   return mapRow(data as ArticleRow);
+}
+
+/** Fetch by human-readable slug (falls back to id lookup if slug column missing). */
+export async function fetchArticleBySlug(slug: string): Promise<Article | null> {
+  const { data, error } = await supabase
+    .from('articles')
+    .select('*')
+    .eq('slug', slug)
+    .single();
+  if (error) return null;
+  return mapRow(data as ArticleRow);
+}
+
+/** Fetch by slug first, then by id — handles both URL formats. */
+export async function fetchArticleBySlugOrId(slugOrId: string): Promise<Article | null> {
+  // Try slug first (human-readable URLs)
+  const bySlug = await fetchArticleBySlug(slugOrId);
+  if (bySlug) return bySlug;
+  // Fall back to id (backward compat with existing links)
+  return fetchArticleById(slugOrId);
+}
+
+/** Returns the canonical URL path for an article, preferring slug over id. */
+export function articlePath(article: Pick<Article, 'id' | 'slug'>): string {
+  return `/article/${article.slug ?? article.id}`;
 }
 
 export async function fetchFeatured(limit = 3): Promise<Article[]> {
@@ -199,6 +226,16 @@ export async function fetchAllArticleIds(): Promise<string[]> {
     .order('published_at', { ascending: false });
   if (error) return [];
   return (data as { id: string }[]).map((row) => row.id);
+}
+
+/** Returns slug-or-id for each article — used by sitemap and RSS feed. */
+export async function fetchAllArticleSlugsOrIds(): Promise<{ id: string; slug: string | null }[]> {
+  const { data, error } = await supabase
+    .from('articles')
+    .select('id, slug')
+    .order('published_at', { ascending: false });
+  if (error) return [];
+  return data as { id: string; slug: string | null }[];
 }
 
 export async function fetchByTag(tag: string, limit = 30): Promise<Article[]> {

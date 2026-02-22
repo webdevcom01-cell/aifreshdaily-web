@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { Layers, ExternalLink, Loader2, ChevronDown } from 'lucide-react';
-import { fetchArticlesPaged } from '@/lib/supabase';
+import { fetchArticlesPaged , articlePath } from '@/lib/supabase';
 import type { Article } from '@/types';
 
 const categoryTabs = [
@@ -105,7 +105,7 @@ export default function IndustryDeepDive() {
       {!isLoading && featured && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Featured — large card */}
-          <Link href={`/article/${featured.id}`} className="lg:col-span-2 group cursor-pointer">
+          <Link href={articlePath(featured)} className="lg:col-span-2 group cursor-pointer">
             <div className="relative rounded-xl overflow-hidden border border-gray-200 dark:border-white/10 bg-white dark:bg-white/[0.02]">
               <div className="relative aspect-[16/9] overflow-hidden">
                 <img src={featured.image} alt={featured.headline}
@@ -128,7 +128,7 @@ export default function IndustryDeepDive() {
           {/* Side cards */}
           <div className="space-y-4">
             {sideArticles.map((article) => (
-              <Link key={article.id} href={`/article/${article.id}`}
+              <Link key={article.id} href={articlePath(article)}
                 className="block group rounded-xl overflow-hidden border border-gray-200 dark:border-white/10 bg-white dark:bg-white/[0.02] hover:bg-gray-50 dark:hover:bg-white/[0.04] transition-colors">
                 <div className="relative aspect-[2/1] overflow-hidden">
                   <img src={article.image} alt={article.headline}
@@ -159,7 +159,7 @@ export default function IndustryDeepDive() {
       {!isLoading && gridArticles.length > 0 && (
         <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {gridArticles.map((article) => (
-            <Link key={article.id} href={`/article/${article.id}`}
+            <Link key={article.id} href={articlePath(article)}
               className="group block bg-white dark:bg-white/[0.02] rounded-xl overflow-hidden border border-gray-200 dark:border-white/10 hover:border-ai-purple/30 dark:hover:border-ai-cyan/30 transition-all hover:shadow-lg">
               {article.image && (
                 <div className="aspect-video overflow-hidden">

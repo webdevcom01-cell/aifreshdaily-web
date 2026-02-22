@@ -1,5 +1,5 @@
 import type { MetadataRoute } from 'next';
-import { fetchAllArticleIds, fetchPopularTags } from '@/lib/supabase';
+import { fetchAllArticleSlugsOrIds, fetchPopularTags } from '@/lib/supabase';
 
 const SITE_URL = 'https://aifreshdaily.com';
 
@@ -35,9 +35,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Dynamic article pages from Supabase
   let articlePages: MetadataRoute.Sitemap = [];
   try {
-    const ids = await fetchAllArticleIds();
-    articlePages = ids.map((id) => ({
-      url: `${SITE_URL}/article/${id}`,
+    const articles = await fetchAllArticleSlugsOrIds();
+    articlePages = articles.map(({ id, slug }) => ({
+      url: `${SITE_URL}/article/${slug ?? id}`,
       lastModified: new Date(),
       changeFrequency: 'weekly' as const,
       priority: 0.7,

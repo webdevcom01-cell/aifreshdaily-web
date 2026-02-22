@@ -1,7 +1,7 @@
 "use client"
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { fetchBreaking } from '@/lib/supabase';
+import { fetchBreaking , articlePath } from '@/lib/supabase';
 import type { Article } from '@/types';
 import { X, Zap } from 'lucide-react';
 
@@ -43,7 +43,7 @@ export default function BreakingNews() {
             <div className="w-2 h-2 bg-white rounded-full animate-pulse-dot" />
           </div>
           <div className="flex-1 min-w-0 overflow-hidden">
-            <Link href={`/article/${currentArticle.id}`} className="block group">
+            <Link href={articlePath(currentArticle)} className="block group">
               <p className="text-sm font-medium truncate group-hover:underline">
                 {currentArticle.headline}
               </p>

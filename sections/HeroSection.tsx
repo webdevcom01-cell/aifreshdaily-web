@@ -1,7 +1,7 @@
 "use client"
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { fetchHeroArticles } from '@/lib/supabase';
+import { fetchHeroArticles , articlePath } from '@/lib/supabase';
 import { Zap } from 'lucide-react';
 import type { Article } from '@/types';
 
@@ -56,7 +56,7 @@ export default function HeroSection() {
 
           {/* Main Featured Article */}
           <div className="lg:col-span-7 -mx-4 sm:mx-0">
-            <Link href={`/article/${mainArticle.id}`} className="group block cursor-pointer">
+            <Link href={articlePath(mainArticle)} className="group block cursor-pointer">
               <div className="relative overflow-hidden sm:rounded-xl">
                 <img
                   src={mainArticle.image}
@@ -94,7 +94,7 @@ export default function HeroSection() {
           <div className="lg:col-span-5 space-y-5">
             {sideArticles.map((article, index) => (
               <Link
-                href={`/article/${article.id}`}
+                href={articlePath(article)}
                 key={article.id}
                 className={`group block cursor-pointer ${
                   index !== sideArticles.length - 1

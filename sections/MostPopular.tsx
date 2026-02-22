@@ -1,7 +1,7 @@
 "use client"
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { fetchMostPopular } from '@/lib/supabase';
+import { fetchMostPopular , articlePath } from '@/lib/supabase';
 import type { Article } from '@/types';
 import { BarChart3 } from 'lucide-react';
 
@@ -43,7 +43,7 @@ export default function MostPopular() {
       </div>
       <div className="space-y-0">
         {articles.map((article, index) => (
-          <Link href={`/article/${article.id}`} key={article.id} className="group block cursor-pointer py-4 border-b border-gray-200 dark:border-ai-space-medium last:border-0">
+          <Link href={articlePath(article)} key={article.id} className="group block cursor-pointer py-4 border-b border-gray-200 dark:border-ai-space-medium last:border-0">
             <div className="flex items-start gap-4">
               <span className="text-2xl font-black text-gray-200 dark:text-ai-space-medium font-heading group-hover:ai-gradient-text transition-colors w-8 flex-shrink-0">
                 {String(index + 1).padStart(2, '0')}

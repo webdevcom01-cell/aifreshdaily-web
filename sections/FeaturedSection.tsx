@@ -1,7 +1,7 @@
 "use client"
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { fetchFeatured } from '@/lib/supabase';
+import { fetchFeatured , articlePath } from '@/lib/supabase';
 import type { Article } from '@/types';
 import { Star } from 'lucide-react';
 
@@ -43,7 +43,7 @@ export default function FeaturedSection() {
       </div>
       <div className="space-y-5">
         {articles.map((article) => (
-          <Link href={`/article/${article.id}`} key={article.id} className="group block cursor-pointer flex gap-4">
+          <Link href={articlePath(article)} key={article.id} className="group block cursor-pointer flex gap-4">
             <div className="flex-1 min-w-0">
               <span className="text-xs text-ai-purple dark:text-ai-cyan font-medium uppercase tracking-wider">{article.category}</span>
               <h3 className="mt-1 text-sm font-semibold text-gray-900 dark:text-gray-100 leading-snug group-hover:text-ai-purple dark:group-hover:text-ai-cyan transition-colors font-heading line-clamp-2">

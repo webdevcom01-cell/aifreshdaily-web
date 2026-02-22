@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Terminal, Code, ExternalLink } from 'lucide-react';
-import { fetchByCategory } from '@/lib/supabase';
+import { fetchByCategory , articlePath } from '@/lib/supabase';
 import type { Article } from '@/types';
 
 export default function CodingSection() {
@@ -72,7 +72,7 @@ export default function CodingSection() {
                 <span className="font-mono-ai text-sm text-green-500 dark:text-green-400">{'> _'} The New Developer Stack</span>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-                <Link href={`/article/${featured.id}`} className="lg:col-span-3 group block cursor-pointer">
+                <Link href={articlePath(featured)} className="lg:col-span-3 group block cursor-pointer">
                     <div className="relative rounded-xl overflow-hidden border border-gray-200 dark:border-white/10 bg-white dark:bg-white/[0.02]">
                         <div className="relative aspect-[16/9] overflow-hidden">
                             <img src={featured.image} alt={featured.headline} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
@@ -96,7 +96,7 @@ export default function CodingSection() {
                 </Link>
                 <div className="lg:col-span-2 space-y-4">
                     {sideArticles.map((article) => (
-                        <Link href={`/article/${article.id}`} key={article.id} className="group flex gap-3 p-3 rounded-lg border border-gray-200 dark:border-white/10 bg-white dark:bg-white/[0.02] hover:bg-gray-50 dark:hover:bg-white/[0.04] transition-colors cursor-pointer">
+                        <Link href={articlePath(article)} key={article.id} className="group flex gap-3 p-3 rounded-lg border border-gray-200 dark:border-white/10 bg-white dark:bg-white/[0.02] hover:bg-gray-50 dark:hover:bg-white/[0.04] transition-colors cursor-pointer">
                             <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden">
                                 <img src={article.image} alt={article.headline} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                             </div>
